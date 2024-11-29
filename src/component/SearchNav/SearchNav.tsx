@@ -12,6 +12,10 @@ import { setTrue } from "../../redux/slices/FormSlice";
 import { BsPlus, BsSearch } from "react-icons/bs";
 import { AppDispatch } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
+import Gantt from "dhtmlx-gantt";
+
+const gantt: any = Gantt;
 
 const SearchNav: React.FC = () => {
   const [autoSchedule, setAutoSchedule] = useState(false);
@@ -37,25 +41,42 @@ const SearchNav: React.FC = () => {
     }
   };
 
-  // Handle file export
-  const handleFileExport = () => {
-    const data = [
-      { name: "John Doe", age: 28 },
-      { name: "Jane Smith", age: 32 },
-    ];
-
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [["Name", "Age"], ...data.map((item) => [item.name, item.age])]
-        .map((row) => row.join(","))
-        .join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "export.csv");
-    link.click();
+  const handleExportExcel = () => {
+    // Get Gantt chart serialized data
+    const serializedData = gantt.serialize();
+  
+    // Extract tasks data (ensure it's an array)
+    const tasksData = serializedData.data || [];
+    console.log("Tasks Data:", tasksData);  // Check that tasksData is populated correctly
+  
+    // If no tasks data, exit early
+    if (tasksData.length === 0) {
+      console.log("No tasks data to export.");
+      return;  // Exit if there's no data to export
+    }
+  
+    // Optional: Flatten or modify the structure of the tasksData
+    const flattenedData = tasksData.map((task: any) => ({
+      id: task.id,
+      text: task.text,
+      start_date: task.start_date,
+      duration: task.duration,
+      progress: task.progress
+    }));
+  
+    console.log("Flattened Tasks Data:", flattenedData);  // Ensure this is an array of objects
+  
+    // Convert the tasks data to an Excel sheet
+    const worksheet = XLSX.utils.json_to_sheet(flattenedData);
+    console.log("Worksheet:", worksheet);  // Inspect the worksheet content
+  
+    const workbook = XLSX.utils.book_new();  // Create a new workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Gantt Data');  // Append sheet to workbook
+  
+    // Export the Excel file
+    XLSX.writeFile(workbook, 'gantt_chart_data.xlsx');
   };
+  
 
   // Handle search input
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,7 +183,7 @@ const SearchNav: React.FC = () => {
                     onChange={handleFileImport}
                   />
                 </Dropdown.Item>
-                <Dropdown.Item onClick={handleFileExport}>
+                <Dropdown.Item onClick={handleExportExcel}>
                   Export CSV
                 </Dropdown.Item>
               </Dropdown.Menu>

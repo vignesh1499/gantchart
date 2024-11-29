@@ -39,6 +39,7 @@ const GanttChart: React.FC = () => {
   }, [navigate]);
 
   const onSubmit = (task: any) => {
+    console.log("Task",task);
     return task;
   };
 
@@ -139,7 +140,7 @@ const GanttChart: React.FC = () => {
         gantt.clearAll(); // Clean up Gantt on unmount
       };
     }
-  }, []);
+  }, [fetchAllTasks]);
 
   useEffect(() => {
     if (zoomLevel === "hours") {

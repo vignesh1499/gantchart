@@ -1,11 +1,17 @@
-import gantt from "dhtmlx-gantt"
+import gantt from "dhtmlx-gantt";
 import { TaskService } from "../service/services";
 import { toast } from "react-toastify";
 
 export const convertTimestampToDate = (timestamp) => {
-    const date = new Date(timestamp);
-    return date; // Make sure it returns a valid date object
-  };
+  const date = new Date(timestamp);
+  return date; // Make sure it returns a valid date object
+};
+
+export const normalizeToUTC = dateStr => {
+  const date = new Date(dateStr);
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+};
+
 
 export const calculateDurationInDays = (startDate, endDate) => {
   const timeDiff = new Date(endDate).getTime() - new Date(startDate).getTime(); // Difference in milliseconds
@@ -22,17 +28,26 @@ export const fetchAllTasks = async () => {
       toast.info("No Data to Show");
     } else {
       const tasks = getAll.map((task) => {
+        console.log("data", task);
+
         const duration = calculateDurationInDays(
           task.start_date,
           task.end_date
         );
+
+        console.log("data", task);
+
         const startDate = convertTimestampToDate(task.start_date)
           .toISOString()
           .split("T")[0];
+
+          console.log("start_date",startDate);
+          
         return {
           id: task.id,
           text: task.text,
-          start_date: startDate,
+          start_date: normalizeToUTC(task.start_date),
+          end_date: normalizeToUTC(task.end_date),
           duration: duration,
           progress: task.progress || 0,
           parent: task.parent || 0,
@@ -49,4 +64,3 @@ export const fetchAllTasks = async () => {
     console.error("Error fetching tasks:", error);
   }
 };
-
