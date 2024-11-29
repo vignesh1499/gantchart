@@ -268,7 +268,7 @@ const AddTaskForm: React.FC<TaskFormProps> = ({ open, onClose, onCreate }) => {
 
   return (
     <Modal show={open} onHide={handleCancel} centered className="custom-modal">
-      <div className="task-form-header text-left">
+      <div className="task-form-header text-left" style={{ padding:"20px 15px"}}>
         <h3>{isUpdate.is_update ? "Update Task" : "New Task"}</h3>
       </div>
       <Modal.Body className="task-form-body">
@@ -461,15 +461,14 @@ const AddTaskForm: React.FC<TaskFormProps> = ({ open, onClose, onCreate }) => {
             }}
           >
             <Button
-              style={{ width: "100px" }}
+              style={{ width: "150px" }}
               variant="primary"
               onClick={handleSubmit}
             >
               Create
             </Button>
             <Button
-              style={{ width: "100px" }}
-              variant="secondary"
+              style={{ width: "150px", border:"1px solid black", backgroundColor:"white" , color:"black"}}
               onClick={handleCancel}
             >
               Cancel
